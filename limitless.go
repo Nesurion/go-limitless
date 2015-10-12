@@ -125,6 +125,24 @@ func (g *LimitlessGroup) Night() error {
 	return g.Controller.sendMsg(msg)
 }
 
+func (g *LimitlessGroup) Disco() error {
+	msg := NewLimitlessMessage()
+	msg.Key = uint8(0x4D + ((g.Id - 1) * 2))
+	return g.Controller.sendMsg(msg)
+}
+
+func (g *LimitlessGroup) DiscoFaster() error {
+	msg := NewLimitlessMessage()
+	msg.Key = uint8(0x44 + ((g.Id - 1) * 2))
+	return g.Controller.sendMsg(msg)
+}
+
+func (g *LimitlessGroup) DiscoSlower() error {
+	msg := NewLimitlessMessage()
+	msg.Key = uint8(0x43 + ((g.Id - 1) * 2))
+	return g.Controller.sendMsg(msg)
+}
+
 func (g *LimitlessGroup) Activate() error {
 	return g.On()
 }
