@@ -40,6 +40,11 @@ func NewLimitlessMessage() *LimitlessMessage {
 	return &msg
 }
 
+func (m *LimitlessMessage) generateKey(hex int, g *LimitlessGroup) {
+	m.Key = uint8(hex + ((g.Id - 1) * 2))
+	return
+}
+
 func (g *LimitlessGroup) SendColor(c colorful.Color) error {
 	h, s, v := c.Hsv()
 	h = 240.0 - h
@@ -98,30 +103,48 @@ func (g *LimitlessGroup) SetBri(b uint8) error {
 }
 func (g *LimitlessGroup) White() error {
 	msg := NewLimitlessMessage()
-	msg.Key = uint8(0xC5 + ((g.Id - 1) * 2))
+	msg.generateKey(0xC5, g)
 	return g.Controller.sendMsg(msg)
 }
 
 func (g *LimitlessGroup) On() error {
 	msg := NewLimitlessMessage()
-	msg.Key = uint8(0x45 + ((g.Id - 1) * 2))
+	msg.generateKey(0x45, g)
 	return g.Controller.sendMsg(msg)
 }
 
 func (g *LimitlessGroup) Off() error {
 	msg := NewLimitlessMessage()
-	msg.Key = uint8(0x46 + ((g.Id - 1) * 2))
+	msg.generateKey(0x46, g)
 	return g.Controller.sendMsg(msg)
 }
 
 func (g *LimitlessGroup) Night() error {
 	msg := NewLimitlessMessage()
-	msg.Key = uint8(0xC6 + ((g.Id - 1) * 2))
+	msg.generateKey(0xC6, g)
 	err := g.Off()
 	if err != nil {
 		return err
 	}
 	time.Sleep(100 * time.Millisecond)
+	return g.Controller.sendMsg(msg)
+}
+
+func (g *LimitlessGroup) Disco() error {
+	msg := NewLimitlessMessage()
+	msg.generateKey(0x4D, g)
+	return g.Controller.sendMsg(msg)
+}
+
+func (g *LimitlessGroup) DiscoFaster() error {
+	msg := NewLimitlessMessage()
+	msg.generateKey(0x44, g)
+	return g.Controller.sendMsg(msg)
+}
+
+func (g *LimitlessGroup) DiscoSlower() error {
+	msg := NewLimitlessMessage()
+	msg.generateKey(0x43, g)
 	return g.Controller.sendMsg(msg)
 }
 
