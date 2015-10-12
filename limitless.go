@@ -116,7 +116,7 @@ func (g *LimitlessGroup) Off() error {
 
 func (g *LimitlessGroup) Night() error {
 	msg := NewLimitlessMessage()
-	msg.Key = 0xC6
+	msg.Key = uint8(0xC6 + ((g.Id - 1) * 2))
 	err := g.Off()
 	if err != nil {
 		return err
