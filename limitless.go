@@ -88,16 +88,25 @@ func (g *LimitlessGroup) SendColor(c colorful.Color) error {
 func (g *LimitlessGroup) SetHue(h uint8) error {
 	msg := NewLimitlessMessage()
 	msg.generateKey(0x40, g)
-	msg.Value = h
+	err := g.On()
+	if err != nil {
+		return err
+	}
+	time.Sleep(100 * time.Millisecond)
 	return g.Controller.sendMsg(msg)
 }
 
 func (g *LimitlessGroup) SetBri(b uint8) error {
 	msg := NewLimitlessMessage()
 	msg.generateKey(0x4e, g)
-	msg.Value = b
+	err := g.On()
+	if err != nil {
+		return err
+	}
+	time.Sleep(100 * time.Millisecond)
 	return g.Controller.sendMsg(msg)
 }
+
 func (g *LimitlessGroup) White() error {
 	msg := NewLimitlessMessage()
 	msg.generateKey(0xC5, g)
