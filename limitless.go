@@ -93,9 +93,6 @@ func (g *LimitlessGroup) SetHue(h uint8) error {
 }
 
 func (g *LimitlessGroup) SetBri(b uint8) error {
-	if b > MAX_BRIGHTNESS {
-		return err
-	}
 	msg := NewLimitlessMessage()
 	msg.generateKey(0x4e, g)
 	msg.Value = b
