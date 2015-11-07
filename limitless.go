@@ -87,17 +87,17 @@ func (g *LimitlessGroup) SendColor(c colorful.Color) error {
 
 func (g *LimitlessGroup) SetHue(h uint8) error {
 	msg := NewLimitlessMessage()
-	msg.Key = 0x40
+	msg.generateKey(0x40, g)
 	msg.Value = h
 	return g.Controller.sendMsg(msg)
 }
 
 func (g *LimitlessGroup) SetBri(b uint8) error {
-	//if b > MAX_BRIGHTNESS {
-	//return err
-	//}
+	if b > MAX_BRIGHTNESS {
+		return err
+	}
 	msg := NewLimitlessMessage()
-	msg.Key = 0x4e
+	msg.generateKey(0x4e, g)
 	msg.Value = b
 	return g.Controller.sendMsg(msg)
 }
