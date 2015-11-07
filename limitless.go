@@ -3,6 +3,7 @@ package limitless
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"github.com/lucasb-eyer/go-colorful"
 	"net"
 	"time"
@@ -87,7 +88,8 @@ func (g *LimitlessGroup) SendColor(c colorful.Color) error {
 
 func (g *LimitlessGroup) SetHue(h uint8) error {
 	msg := NewLimitlessMessage()
-	msg.generateKey(0x40, g)
+	msg.Key = 0x40
+	msg.Value = h
 	err := g.On()
 	if err != nil {
 		return err
@@ -97,8 +99,12 @@ func (g *LimitlessGroup) SetHue(h uint8) error {
 }
 
 func (g *LimitlessGroup) SetBri(b uint8) error {
+	if b > MAX_BRIGHTNESS {
+		return errors.New("brightness too high. (max 0x1B)")
+	}
 	msg := NewLimitlessMessage()
-	msg.generateKey(0x4e, g)
+	msg.Key = 0x4E
+	msg.Value = b
 	err := g.On()
 	if err != nil {
 		return err
