@@ -90,7 +90,7 @@ func (g *LimitlessGroup) SetHue(h uint8) error {
 	msg := NewLimitlessMessage()
 	msg.Key = 0x40
 	msg.Value = h
-	err := g.On()
+	err := g.Activate()
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (g *LimitlessGroup) SetBri(b uint8) error {
 	msg := NewLimitlessMessage()
 	msg.Key = 0x4E
 	msg.Value = b
-	err := g.On()
+	err := g.Activate()
 	if err != nil {
 		return err
 	}
@@ -166,6 +166,7 @@ func (g *LimitlessGroup) Activate() error {
 
 func (c *LimitlessController) sendMsg(msg *LimitlessMessage) error {
 	conn, err := net.Dial("udp", c.Host+":"+LIMITLESS_PORT)
+	defer conn.Close()
 	if err != nil {
 		return err
 	}
