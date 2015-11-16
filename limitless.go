@@ -37,15 +37,39 @@ const (
 const MAX_BRIGHTNESS = 0x1b
 
 func NewLimitlessController(host string) (*LimitlessController, error) {
-	conn, err := net.Dial("udp", host+":"+LIMITLESS_PORT)
+	c := LimitlessController{
+		Host: host,
+	}
+	err := c.OpenConnection(host)
 	if err != nil {
 		return nil, err
 	}
-	c := LimitlessController{
-		Host:       host,
-		Connection: conn,
-	}
 	return &c, nil
+}
+
+func (c *LimitlessController) CloseConnection() error {
+	err := c.Connection.Close()
+	return err
+}
+
+func (c *LimitlessController) OpenConnection(host string) error {
+	conn, err := net.Dial("udp", host+":"+LIMITLESS_PORT)
+	if err == nil {
+		c.Connection = conn
+	}
+	return err
+}
+
+func (c *LimitlessController) AllOn() error {
+	msg := NewLimitlessMessage()
+	msg.Key = 0x42
+	return c.sendMsg(msg)
+}
+
+func (c *LimitlessController) AllOff() error {
+	msg := NewLimitlessMessage()
+	msg.Key = 0x41
+	return c.sendMsg(msg)
 }
 
 func NewLimitlessMessage() *LimitlessMessage {
@@ -180,6 +204,6 @@ func (g *LimitlessGroup) Activate() error {
 func (c *LimitlessController) sendMsg(msg *LimitlessMessage) error {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, msg)
-	_, err := c.Connection.Write(buf.Bytes())
+	transferedByte, err := c.Connection.Write(buf.Bytes())
 	return err
 }
