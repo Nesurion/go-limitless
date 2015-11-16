@@ -204,6 +204,6 @@ func (g *LimitlessGroup) Activate() error {
 func (c *LimitlessController) sendMsg(msg *LimitlessMessage) error {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, msg)
-	transferedByte, err := c.Connection.Write(buf.Bytes())
+	_, err := c.Connection.Write(buf.Bytes())
 	return err
 }
