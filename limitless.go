@@ -10,9 +10,10 @@ import (
 )
 
 type LimitlessController struct {
-	Host   string           `json:"host"`
-	Name   string           `json:"name"`
-	Groups []LimitlessGroup `json:"groups"`
+	Host       string           `json:"host"`
+	Name       string           `json:"name"`
+	Connection net.Conn         `json:"-"`
+	Groups     []LimitlessGroup `json:"groups"`
 }
 
 type LimitlessGroup struct {
@@ -34,6 +35,42 @@ const (
 )
 
 const MAX_BRIGHTNESS = 0x1b
+
+func NewLimitlessController(host string) (*LimitlessController, error) {
+	c := LimitlessController{
+		Host: host,
+	}
+	err := c.OpenConnection(host)
+	if err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+func (c *LimitlessController) CloseConnection() error {
+	err := c.Connection.Close()
+	return err
+}
+
+func (c *LimitlessController) OpenConnection(host string) error {
+	conn, err := net.Dial("udp", host+":"+LIMITLESS_PORT)
+	if err == nil {
+		c.Connection = conn
+	}
+	return err
+}
+
+func (c *LimitlessController) AllOn() error {
+	msg := NewLimitlessMessage()
+	msg.Key = 0x42
+	return c.sendMsg(msg)
+}
+
+func (c *LimitlessController) AllOff() error {
+	msg := NewLimitlessMessage()
+	msg.Key = 0x41
+	return c.sendMsg(msg)
+}
 
 func NewLimitlessMessage() *LimitlessMessage {
 	msg := LimitlessMessage{}
@@ -165,13 +202,8 @@ func (g *LimitlessGroup) Activate() error {
 }
 
 func (c *LimitlessController) sendMsg(msg *LimitlessMessage) error {
-	conn, err := net.Dial("udp", c.Host+":"+LIMITLESS_PORT)
-	defer conn.Close()
-	if err != nil {
-		return err
-	}
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, msg)
-	_, err = conn.Write(buf.Bytes())
+	_, err := c.Connection.Write(buf.Bytes())
 	return err
 }
