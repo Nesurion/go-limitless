@@ -71,6 +71,13 @@ func (m *LimitlessMessage) generateKey(hex int, g *LimitlessGroup) {
 	return
 }
 
+func (g *LimitlessGroup) SendColorByte(code uint8) {
+	msg := NewLimitlessMessage()
+	msg.Key = 0x40
+	msg.Value = code
+	g.Controller.sendMsg(msg)
+}
+
 func (g *LimitlessGroup) SendColor(c colorful.Color) error {
 	h, s, v := c.Hsv()
 	h = 240.0 - h
